@@ -1,18 +1,35 @@
-import { createHomeTab } from './home.js';
-import { createAboutTab } from './about.js';
-import { createContactTab } from './contact.js';
+import ProjectManager from './ProjectManager';
+import DOMHandler from './DOMHandler';
 
-function loadTab(tabFunction) {
-    const content = document.getElementById('content');
-    content.innerHTML = tabFunction(); // Directly set the HTML content
-}
+const projectManager = new ProjectManager();
+const domHandler = new DOMHandler();
 
-// Wrap all DOM interactions in DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('home-btn').addEventListener('click', () => loadTab(createHomeTab));
-    document.getElementById('about-btn').addEventListener('click', () => loadTab(createAboutTab));
-    document.getElementById('contact-btn').addEventListener('click', () => loadTab(createContactTab));
-
-    // Default tab load
-    loadTab(createHomeTab);
+// Set up event handlers
+domHandler.setProjectDeleteHandler((index) => {
+    projectManager.deleteProject(index);
+    domHandler.renderProjects(projectManager.getAllProjects());
 });
+
+domHandler.setTaskDeleteHandler((index) => {
+    projectManager.deleteTask(0, index); // Assuming we're working with the first project for now
+    domHandler.renderTasks(projectManager.getProject(0).getAllTasks());
+});
+
+domHandler.setTaskEditHandler((task, index) => {
+    // Implement task editing logic here
+    console.log('Edit task:', task, index);
+});
+
+// Set up form handlers
+domHandler.setupProjectForm((title, description) => {
+    projectManager.createProject(title, description);
+    domHandler.renderProjects(projectManager.getAllProjects());
+});
+
+domHandler.setupTaskForm((title, description, dueDate, priority) => {
+    projectManager.createTask(0, title, description, dueDate, priority); // Assuming we're working with the first project for now
+    domHandler.renderTasks(projectManager.getProject(0).getAllTasks());
+});
+
+// Initial render
+domHandler.renderProjects(projectManager.getAllProjects());
